@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Pytest cache
+.pytest_cache/
+
+# VS Code settings
+.vscode/
+
+# macOS
+.DS_Store
+
+# Python-specific cache
+*.egg-info/
+
+# Environment variables (secrets should never be in files)
+.env
+
+# GitHub workflow artifacts
+*.log
+*.out
+*.tmp
+
+# Ignore idea (if using JetBrains IDEs)
+.idea/
