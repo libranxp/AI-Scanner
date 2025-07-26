@@ -1,0 +1,37 @@
+name: Telegram Alert Bot
+
+on:
+  workflow_dispatch:  # Allows manual trigger
+  schedule:
+    - cron: '*/10 * * * *'  # Runs every 10 minutes
+
+jobs:
+  send-alerts:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Alert Bot
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        PENNY_STOCK_CHANNEL_ID: ${{ secrets.PENNY_STOCK_CHANNEL_ID }}
+        STOCK_CHANNEL_ID: ${{ secrets.STOCK_CHANNEL_ID }}
+        CRYPTO_CHANNEL_ID: ${{ secrets.CRYPTO_CHANNEL_ID }}
+        PEAK_START_TIME: ${{ secrets.PEAK_START_TIME }}
+        PEAK_END_TIME: ${{ secrets.PEAK_END_TIME }}
+        ALERT_INTERVAL_PENNY_PEAK: ${{ secrets.ALERT_INTERVAL_PENNY_PEAK }}
+        ALERT_INTERVAL_PENNY_OFF: ${{ secrets.ALERT_INTERVAL_PENNY_OFF }}
+        ALERT_INTERVAL_CRYPTO: ${{ secrets.ALERT_INTERVAL_CRYPTO }}
+      run: python secure_alert_bot/main.py
