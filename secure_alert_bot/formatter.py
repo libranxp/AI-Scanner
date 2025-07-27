@@ -1,105 +1,102 @@
-# formatter.py
+import re
 
-def format_penny_stock_alert(alert):
-    return f"""
-🚨 Penny Stock Alert — High Conviction Setup
+def escape_markdown(text):
+    """
+    Escape text for Telegram MarkdownV2 parse_mode.
+    """
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', str(text))
 
-Symbol: ${alert['symbol']}
-Strategy: {alert['strategy']}
-Entry: {alert['entry']} | TP: {alert['target']} | SL: {alert['stop_loss']}
-Confidence Score: 🟩 {alert['confidence']}% (Strong Setup)
-Catalyst: {alert['catalyst']}
-Sentiment Score: {alert['sentiment']} (Bullish Momentum)
 
-📊 Float: {alert['float']} | Volume Surge: {alert['volume_surge']} | RSI: {alert['rsi']} | ATR: {alert['atr']}
-🔗 TradingView Chart: {alert['chart_link']}
-🔗 Buy on Trading212: https://www.trading212.com/
-🔗 Order Book: https://bookmap.com/{alert['symbol'].lower()}
-🔗 Catalyst News: {alert['news_link']}
+def format_penny_alert(data):
+    return (
+        "🚨 *Penny Stock Alert — High Conviction Setup*\n\n"
+        f"*Symbol:* ${escape_markdown(data['symbol'])}\n"
+        f"*Strategy:* {escape_markdown(data['strategy'])}\n"
+        f"*Entry:* ${escape_markdown(data['entry'])} | *TP:* ${escape_markdown(data['tp'])} | *SL:* ${escape_markdown(data['sl'])}\n"
+        f"*Confidence Score:* {escape_markdown(data['confidence_emoji'])} {escape_markdown(data['confidence_percent'])}% ({escape_markdown(data['confidence_text'])})\n"
+        f"*Catalyst:* {escape_markdown(data['catalyst'])}\n"
+        f"*Sentiment Score:* {escape_markdown(data['sentiment_score'])} ({escape_markdown(data['sentiment_text'])})\n\n"
+        f"📊 *Float:* {escape_markdown(data['float'])}M | *Volume Surge:* +{escape_markdown(data['volume_surge'])}% | *RSI:* {escape_markdown(data['rsi'])} | *ATR:* {escape_markdown(data['atr'])}\n"
+        f"🔗 [TradingView Chart]({escape_markdown(data['tv_chart'])})\n"
+        f"🔗 [Buy on Trading212]({escape_markdown(data['buy_link'])})\n"
+        f"🔗 [Order Book]({escape_markdown(data['order_book'])})\n"
+        f"🔗 [Catalyst News]({escape_markdown(data['catalyst_news'])})\n\n"
+        f"⚠️ *Notes:* {escape_markdown(data['notes'])}"
+    )
 
-⚠️ Notes: {alert['notes']}
-"""
 
-def format_regular_stock_alert(alert):
-    return f"""
-🚨 Stock Alert — Swing Setup
+def format_stock_alert(data):
+    return (
+        "🚨 *Stock Alert — Swing Setup*\n\n"
+        f"*Symbol:* ${escape_markdown(data['symbol'])}\n"
+        f"*Strategy:* {escape_markdown(data['strategy'])}\n"
+        f"*Entry:* ${escape_markdown(data['entry'])} | *TP:* ${escape_markdown(data['tp'])} | *SL:* ${escape_markdown(data['sl'])}\n"
+        f"*Confidence Score:* {escape_markdown(data['confidence_emoji'])} {escape_markdown(data['confidence_percent'])}% ({escape_markdown(data['confidence_text'])})\n"
+        f"*Catalyst:* {escape_markdown(data['catalyst'])}\n"
+        f"*Sentiment Score:* {escape_markdown(data['sentiment_score'])} ({escape_markdown(data['sentiment_text'])})\n\n"
+        f"📊 *Float:* {escape_markdown(data['float'])}M | *Rel Vol:* {escape_markdown(data['rel_vol'])} | *RSI:* {escape_markdown(data['rsi'])} | *ATR:* {escape_markdown(data['atr'])}\n"
+        f"🔗 [TradingView Chart]({escape_markdown(data['tv_chart'])})\n"
+        f"🔗 [Buy on Trading212]({escape_markdown(data['buy_link'])})\n"
+        f"🔗 [Order Book]({escape_markdown(data['order_book'])})\n"
+        f"🔗 [Catalyst News]({escape_markdown(data['catalyst_news'])})\n\n"
+        f"📝 *Analyst Note:* {escape_markdown(data['analyst_note'])}"
+    )
 
-Symbol: ${alert['symbol']}
-Strategy: {alert['strategy']}
-Entry: {alert['entry']} | TP: {alert['target']} | SL: {alert['stop_loss']}
-Confidence Score: 🟨 {alert['confidence']}% (Watchlist Candidate)
-Catalyst: {alert['catalyst']}
-Sentiment Score: {alert['sentiment']} (Moderate Bullish Bias)
 
-📊 Float: {alert['float']} | Rel Vol: {alert['rel_vol']} | RSI: {alert['rsi']} | ATR: {alert['atr']}
-🔗 TradingView Chart: {alert['chart_link']}
-🔗 Buy on Trading212: https://www.trading212.com/
-🔗 Order Book: https://bookmap.com/{alert['symbol'].lower()}
-🔗 Catalyst News: {alert['news_link']}
+def format_crypto_alert(data):
+    return (
+        "🚨 *Crypto Alert — Momentum Breakout*\n\n"
+        f"*Asset:* ${escape_markdown(data['asset'])}\n"
+        f"*Strategy:* {escape_markdown(data['strategy'])}\n"
+        f"*Entry:* ${escape_markdown(data['entry'])} | *TP:* ${escape_markdown(data['tp'])} | *SL:* ${escape_markdown(data['sl'])}\n"
+        f"*Confidence Score:* {escape_markdown(data['confidence_emoji'])} {escape_markdown(data['confidence_percent'])}% ({escape_markdown(data['confidence_text'])})\n"
+        f"*Catalyst:* {escape_markdown(data['catalyst'])}\n"
+        f"*Sentiment Score:* {escape_markdown(data['sentiment_score'])} ({escape_markdown(data['sentiment_text'])})\n\n"
+        f"📊 *Volume Spike:* +{escape_markdown(data['volume_spike'])}% | *RSI:* {escape_markdown(data['rsi'])} | *Order Flow:* {escape_markdown(data['order_flow'])}\n"
+        f"🔗 [TradingView Chart]({escape_markdown(data['tv_chart'])})\n"
+        f"🔗 [Trade on Kraken]({escape_markdown(data['trade_link'])})\n"
+        f"🔗 [Order Book]({escape_markdown(data['order_book'])})\n"
+        f"🔗 [Catalyst News]({escape_markdown(data['catalyst_news'])})\n\n"
+        f"📢 *Alert:* {escape_markdown(data['alerts'])}"
+    )
 
-📝 Analyst Note: {alert['notes']}
-"""
 
-def format_crypto_alert(alert):
-    return f"""
-🚨 Crypto Alert — Momentum Breakout
+def format_watchlist_alert(data):
+    return (
+        "🗒️ *Daily Watchlist Update*\n\n"
+        f"*Symbol:* ${escape_markdown(data['symbol'])}\n"
+        f"*Setup:* {escape_markdown(data['setup'])}\n"
+        f"*Price Range:* ${escape_markdown(data['price_range'])}\n"
+        f"*Catalyst:* {escape_markdown(data['catalyst'])}\n"
+        f"*Sentiment:* {escape_markdown(data['sentiment'])}\n"
+        f"*Key Levels:* {escape_markdown(data['key_levels'])}\n\n"
+        f"📊 *Float:* {escape_markdown(data['float'])}M | *Rel Vol:* {escape_markdown(data['rel_vol'])} | *RSI:* {escape_markdown(data['rsi'])}\n"
+        f"🔗 [Chart Link]({escape_markdown(data['chart_link'])}) | 🔗 [News]({escape_markdown(data['news_link'])})"
+    )
 
-Asset: ${alert['symbol']}
-Strategy: {alert['strategy']}
-Entry: {alert['entry']} | TP: {alert['target']} | SL: {alert['stop_loss']}
-Confidence Score: 🟩 {alert['confidence']}% (High Conviction)
-Catalyst: {alert['catalyst']}
-Sentiment Score: {alert['sentiment']} (Strong Buy Signal)
 
-📊 Volume Spike: {alert['volume_surge']} | RSI: {alert['rsi']} | Order Flow: {alert['order_flow']}
-🔗 TradingView Chart: {alert['chart_link']}
-🔗 Trade on Kraken: https://kraken.com/trade/{alert['symbol'].lower()}
-🔗 Order Book: https://bookmap.com/{alert['symbol'].lower()}
-🔗 Catalyst News: {alert['news_link']}
+def format_validation_alert(data):
+    return (
+        "✅ *Trade Validation — Setup Confirmed*\n\n"
+        f"*Symbol:* ${escape_markdown(data['symbol'])}\n"
+        f"*Trigger Level:* ${escape_markdown(data['trigger'])}\n"
+        f"*Breakout Volume:* {escape_markdown(data['volume'])}\n"
+        f"*Order Flow Bias:* {escape_markdown(data['order_flow'])}\n"
+        f"*Sentiment Update:* {escape_markdown(data['sentiment'])}\n"
+        f"*Updated Confidence:* {escape_markdown(data['confidence'])}\n\n"
+        f"🔗 [Live Chart]({escape_markdown(data['chart_link'])})"
+    )
 
-📢 Alert: {alert['notes']}
-"""
 
-def format_watchlist(watchlist):
-    header = """
-📋 Emerald Watchlist (Live Monitor)
-
-Symbol | Strategy     | Entry   | TP     | SL     | Confidence | Catalyst
--------|--------------|---------|--------|--------|------------|---------------------"""
-    rows = "\n".join([f"{item['symbol']}   | {item['strategy']} | {item['entry']}   | {item['target']}  | {item['stop_loss']}  | {item['confidence']}%        | {item['catalyst']}" for item in watchlist])
-    links = "\n".join([f"🔗 [{item['symbol']} Chart]({item['chart_link']}) | [Buy {item['symbol']}]({item['buy_link']})" for item in watchlist])
-    return f"{header}\n{rows}\n\n{links}"
-
-def format_validation(alert):
-    return f"""
-🔍 AI Reasoning — Why is ${alert['symbol']} Trending?
-
-✅ Float & Volume Surge: {alert['float']} float with {alert['volume_surge']} volume spike, indicating breakout potential.
-✅ Catalyst: {alert['catalyst']}
-✅ Sentiment: {alert['sentiment']} — indicates heavy bullish chatter across Reddit & StockTwits.
-✅ Technicals: {alert['technicals']}
-
-⚠️ Caution: {alert['caution']}
-
-📊 AI Verdict: {alert['verdict']}
-"""
-
-def format_wrapup(wrapup_type, date, movers, watchlist_focus, market_conditions, observations=None):
-    if wrapup_type == "pre-market":
-        header = f"🌅 Pre-Market Wrap-Up — {date}"
-    elif wrapup_type == "post-market":
-        header = f"🌇 Post-Market Recap — {date}"
-    else:
-        header = f"📊 Weekend Swing Watchlist"
-
-    movers_section = "\n".join([f"- ${item['symbol']} | {item['gap']} Gap | {item['catalyst']} | {item['sentiment']}" for item in movers])
-    focus_section = "\n".join([f"🟩 {item['symbol']} | Entry: {item['entry']} | TP: {item['target']} | SL: {item['stop_loss']} | Confidence: {item['confidence']}%" for item in watchlist_focus])
-    conditions = f"📊 Market Conditions: {market_conditions}"
-
-    wrapup = f"{header}\n\n🔥 Top Movers:\n{movers_section}\n\n⚡️ Watchlist Focus:\n{focus_section}\n\n{conditions}"
-
-    if observations:
-        obs_section = "\n".join([f"- {obs}" for obs in observations])
-        wrapup += f"\n\n📝 Key Observations:\n{obs_section}"
-
-    return wrapup
+def format_wrapup_alert(data):
+    return (
+        "🔚 *Wrap-Up — Daily Recap*\n\n"
+        f"*Date:* {escape_markdown(data['date'])}\n"
+        f"*Top Gainer:* ${escape_markdown(data['top_gainer'])}\n"
+        f"*Biggest Mover:* ${escape_markdown(data['biggest_mover'])}\n"
+        f"*News Highlight:* {escape_markdown(data['news_highlight'])}\n"
+        f"*Market Sentiment:* {escape_markdown(data['market_sentiment'])}\n\n"
+        f"📊 *SPY Close:* {escape_markdown(data['spy_close'])} | *QQQ Close:* {escape_markdown(data['qqq_close'])}\n"
+        f"🔗 [Full Report]({escape_markdown(data['report_link'])})"
+    )
