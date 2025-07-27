@@ -1,0 +1,43 @@
+name: Alert Dispatcher Bot
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Runs every 10 minutes (adjust as needed)
+  workflow_dispatch:       # Allows manual trigger from GitHub UI
+
+jobs:
+  dispatch-alerts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv
+
+      - name: Run Alert Dispatcher
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_PENNY_CHANNEL: ${{ secrets.TELEGRAM_PENNY_CHANNEL }}
+          TELEGRAM_STOCK_CHANNEL: ${{ secrets.TELEGRAM_STOCK_CHANNEL }}
+          TELEGRAM_CRYPTO_CHANNEL: ${{ secrets.TELEGRAM_CRYPTO_CHANNEL }}
+          TELEGRAM_VALIDATION_CHANNEL: ${{ secrets.TELEGRAM_VALIDATION_CHANNEL }}
+          TELEGRAM_WRAPUP_CHANNEL: ${{ secrets.TELEGRAM_WRAPUP_CHANNEL }}
+          TELEGRAM_WATCHLIST_CHANNEL: ${{ secrets.TELEGRAM_WATCHLIST_CHANNEL }}
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+        run: |
+          python alert_dispatcher.py
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d chat_id="${{ secrets.TELEGRAM_VALIDATION_CHANNEL }}" \
+          -d text="🚨 Alert Dispatcher Failed ❌ — Check GitHub Actions Logs."
