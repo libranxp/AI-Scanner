@@ -8,15 +8,16 @@ def main():
         'PENNY_STOCK_CHANNEL_ID',
         'STOCK_CHANNEL_ID',
         'CRYPTO_CHANNEL_ID',
-        # Add any other required env vars here if needed
+        'FMP_API_KEY'
     ]
 
     for var in required_env_vars:
         if var not in os.environ:
             raise EnvironmentError(f"Missing required environment variable: {var}")
 
-    # Start the scheduler to send alerts (now using CoinGecko in scheduler)
+    # Start the scheduler to send alerts
     run_scheduler()
 
 if __name__ == "__main__":
     main()
+
