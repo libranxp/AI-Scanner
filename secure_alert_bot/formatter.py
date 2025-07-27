@@ -100,3 +100,4 @@ def format_wrapup_alert(data):
         f"📊 *SPY Close:* {escape_markdown(data['spy_close'])} | *QQQ Close:* {escape_markdown(data['qqq_close'])}\n"
         f"🔗 [Full Report]({escape_markdown(data['report_link'])})"
     )
+
