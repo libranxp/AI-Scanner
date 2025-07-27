@@ -1,23 +1,25 @@
+# alert_dispatcher.py
 # FINAL PRODUCTION SCRIPT FOR TELEGRAM ALERTS
 # Scans live tickers using API criteria and sends alerts to corresponding Telegram channels in the specified layouts
 
 import os
 import requests
 from datetime import datetime
+from config import Config
 
-# Telegram Bot Config (from GitHub Secrets)
-BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+# Load Config
+Config.validate()
+BOT_TOKEN = Config.TELEGRAM_BOT_TOKEN
 CHANNELS = {
-    'penny': os.getenv('CHANNEL_PENNY'),
-    'stock': os.getenv('CHANNEL_STOCK'),
-    'crypto': os.getenv('CHANNEL_CRYPTO'),
-    'validation': os.getenv('CHANNEL_VALIDATION'),
-    'wrapup': os.getenv('CHANNEL_WRAPUP'),
-    'watchlist': os.getenv('CHANNEL_WATCHLIST')
+    'penny': Config.PENNY_STOCK_CHANNEL_ID,
+    'stock': Config.STOCK_CHANNEL_ID,
+    'crypto': Config.CRYPTO_CHANNEL_ID,
+    'validation': Config.VALIDATION_CHANNEL_ID,
+    'wrapup': Config.WRAPUP_CHANNEL_ID,
+    'watchlist': Config.WATCHLIST_CHANNEL_ID
 }
 
-# FMP API Config
-FMP_API_KEY = os.getenv('FMP_API_KEY')
+FMP_API_KEY = Config.FMP_API_KEY
 FMP_BASE_URL = 'https://financialmodelingprep.com/api/v3'
 
 # Helper Functions
@@ -32,8 +34,8 @@ def send_telegram_message(channel, message):
     response = requests.post(url, json=payload)
     response.raise_for_status()
 
+
 def fetch_scanner_data():
-    # Example API call - customize filters as per blueprint criteria
     endpoint = f"{FMP_BASE_URL}/stock-screener"
     params = {
         'priceLowerThan': 15,
@@ -45,6 +47,7 @@ def fetch_scanner_data():
     response = requests.get(endpoint, params=params)
     response.raise_for_status()
     return response.json()
+
 
 def format_penny_alert(ticker_data):
     return f"""
@@ -66,6 +69,7 @@ Sentiment Score: {ticker_data['sentiment']} (Bullish Momentum)
 ⚠️ Notes: {ticker_data['notes']}
 """
 
+
 def format_stock_alert(ticker_data):
     return f"""
 🚨 Stock Alert — Swing Setup
@@ -85,6 +89,7 @@ Sentiment Score: {ticker_data['sentiment']} (Moderate Bullish Bias)
 
 📝 Analyst Note: {ticker_data['notes']}
 """
+
 
 def format_crypto_alert(coin_data):
     return f"""
@@ -106,6 +111,7 @@ Sentiment Score: {coin_data['sentiment']} (Strong Buy Signal)
 📢 Alert: {coin_data['notes']}
 """
 
+
 def format_validation_summary(ticker_data):
     return f"""
 🔍 AI Reasoning — Why is ${ticker_data['symbol']} Trending?
@@ -119,6 +125,7 @@ def format_validation_summary(ticker_data):
 
 📊 AI Verdict: {ticker_data['verdict']}
 """
+
 
 def format_premarket_wrap(tickers):
     today = datetime.now().strftime('%B %d, %Y')
@@ -136,6 +143,7 @@ def format_premarket_wrap(tickers):
 📊 Market Conditions: VIX 14.2 | SPY +0.5% Pre-market | Crypto market cap +1.2%
 """
 
+
 def format_watchlist(tickers):
     rows = '\n'.join([f"{t['symbol']}   | {t['strategy']} | ${t['entry']} | ${t['tp']} | ${t['sl']} | {t['confidence']}% | {t['catalyst']}" for t in tickers])
     links = '\n'.join([f"🔗 [{t['symbol']} Chart](https://tradingview.com/symbols/{t['symbol']}/) | [Buy {t['symbol']}](https://trading212.com/)" for t in tickers])
@@ -149,11 +157,11 @@ Symbol | Strategy     | Entry   | TP     | SL     | Confidence | Catalyst
 {links}
 """
 
+
 def main():
     tickers = fetch_scanner_data()
 
     for ticker in tickers:
-        # Based on your criteria, decide which alert type it belongs to (pseudo-logic below)
         if ticker['price'] < 5:
             message = format_penny_alert(ticker)
             send_telegram_message(CHANNELS['penny'], message)
@@ -164,17 +172,16 @@ def main():
             message = format_stock_alert(ticker)
             send_telegram_message(CHANNELS['stock'], message)
 
-        # Send validation summary
         validation_msg = format_validation_summary(ticker)
         send_telegram_message(CHANNELS['validation'], validation_msg)
 
-    # Premarket Wrap-Up
     wrapup_msg = format_premarket_wrap(tickers[:3])
     send_telegram_message(CHANNELS['wrapup'], wrapup_msg)
 
-    # Watchlist
     watchlist_msg = format_watchlist(tickers[:10])
     send_telegram_message(CHANNELS['watchlist'], watchlist_msg)
 
+
 if __name__ == "__main__":
     main()
+
