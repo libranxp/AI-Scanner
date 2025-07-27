@@ -1,8 +1,12 @@
 import os
 from secure_alert_bot.scheduler import run_scheduler
+from logger import get_logger
 
 
-def validate_env_vars():
+def main():
+    logger = get_logger("secure_alert_bot", log_file="logs/bot.log")
+
+    # Ensure all required environment variables are set
     required_env_vars = [
         'TELEGRAM_BOT_TOKEN',
         'PENNY_STOCK_CHANNEL_ID',
@@ -13,16 +17,18 @@ def validate_env_vars():
 
     missing_vars = [var for var in required_env_vars if var not in os.environ]
     if missing_vars:
-        raise EnvironmentError(f"Missing required environment variables: {', '.join(missing_vars)}")
+        for var in missing_vars:
+            logger.error(f"Missing required environment variable: {var}")
+        raise EnvironmentError(f"Missing environment variables: {', '.join(missing_vars)}")
 
-
-def main():
-    print("Validating environment variables...")
-    validate_env_vars()
-
-    print("Starting alert scheduler...")
-    run_scheduler()
+    logger.info("Starting the secure alert bot scheduler...")
+    try:
+        run_scheduler()
+    except Exception as e:
+        logger.exception("Failed to start the scheduler")
+        raise e
 
 
 if __name__ == "__main__":
     main()
+
