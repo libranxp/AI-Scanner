@@ -1,0 +1,43 @@
+name: Telegram Alerts Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: '*/10 * * * *'  # Runs every 10 minutes
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      CHANNEL_PENNY: ${{ secrets.CHANNEL_PENNY }}
+      CHANNEL_STOCK: ${{ secrets.CHANNEL_STOCK }}
+      CHANNEL_CRYPTO: ${{ secrets.CHANNEL_CRYPTO }}
+      CHANNEL_VALIDATION: ${{ secrets.CHANNEL_VALIDATION }}
+      CHANNEL_WRAPUP: ${{ secrets.CHANNEL_WRAPUP }}
+      CHANNEL_WATCHLIST: ${{ secrets.CHANNEL_WATCHLIST }}
+      FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+      FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+      COINMARKETCAL_API_KEY: ${{ secrets.COINMARKETCAL_API_KEY }}
+      ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Alert Dispatcher
+        run: |
+          python alert_dispatcher.py
